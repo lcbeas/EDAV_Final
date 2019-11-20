@@ -1,0 +1,45 @@
+---
+title: "PSet5A"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+1. The Team
+  a) Luke Beasley (lcb2165), 
+
+  b) 
+Chris:
+I, II, III
+Swing rates by player
+Parallel coordinates
+
+Luke:
+IV- Missing values
+Heat maps
+Time series with teams or players
+Histogram over variables
+Shiny interactive 
+
+Gideon:
+Most effective pitch sequences
+Pitch location by bunt opportunties
+Violin plots/ridgeline etc. 
+
+2.
+  a) How do pinch hitters swing rates compare to non-pinch hitters?
+  b) Are certain pitch sequences more effective than others?
+  c) How does a batter's batting average/scatter chart change based on pitch location?
+
+3. 
+  Output: html_document (*plan right now is to create a shiny app as well)
+  
+
+4. 
+  The team data was obtained from www.fangraphs.com, a website meant for hobbyists to explore data within baseball. After navigating to teams screen, we chose multiple seasons of data (2010-2019) and checked the "split seasons" button in order to have a different row for every season for each team, as opposed to aggregating each teams data over those years. The export data button downloads this file as a ready to use .csv file that we import after putting into the correct directory. 
