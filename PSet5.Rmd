@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
 1. The Team
-  a) Luke Beasley (lcb2165), 
+  a) Luke Beasley (lcb2165), Chris Russo (cfr2125), 
 
   b) 
 Chris:
@@ -42,4 +42,7 @@ Violin plots/ridgeline etc.
   
 
 4. 
+
+  The pitch by pitch Statcast data was gathered from baseballsavant.com via the Search page. We downloaded the data in .csv format. Due to the number of observations, we downloaded the pitches one week at a time. We then combined the data sets into an .rda file that contains all 743,495 pitches from the 2019 season.
+
   The team data was obtained from www.fangraphs.com, a website meant for hobbyists to explore data within baseball. After navigating to teams screen, we chose multiple seasons of data (2010-2019) and checked the "split seasons" button in order to have a different row for every season for each team, as opposed to aggregating each teams data over those years. The export data button downloads this file as a ready to use .csv file that we import after putting into the correct directory. 
