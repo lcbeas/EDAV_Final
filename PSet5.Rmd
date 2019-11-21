@@ -46,3 +46,48 @@ Violin plots/ridgeline etc.
   The pitch by pitch Statcast data was gathered from baseballsavant.com via the Search page. We downloaded the data in .csv format. Due to the number of observations, we downloaded the pitches one week at a time. We then combined the data sets into an .rda file that contains all 743,495 pitches from the 2019 season.
 
   The team data was obtained from www.fangraphs.com, a website meant for hobbyists to explore data within baseball. After navigating to teams screen, we chose multiple seasons of data (2010-2019) and checked the "split seasons" button in order to have a different row for every season for each team, as opposed to aggregating each teams data over those years. The export data button downloads this file as a ready to use .csv file that we import after putting into the correct directory. 
+  
+  
+  
+5.
+
+
+```{r}
+  library(ggplot2)
+  library(extracat)
+  library(tidyverse)
+```
+
+After loading in the pbp2019 data set that will be used throughout this analysis, we will first examine the missing values. The data set has too many features to make use of a graph, but a few clear trends exist after looking at the column missing values and taking a look at the data. Many variables such as pitcher, batter, strikes, and balls, have no missing values, while others have large amounts. The explanation for this is inuitive: each pitch represents a row of data and the values without missing values are the values that exist no matter the outcome of the pitch. While many of the variables missing many values depend on the outcome of the pitch. A couple examples: launch_angle will not be present if the ball was not hit. on_2b will not be present if no one is on second base.
+
+Interestingly, we see related variables share the same values of missing variables, such as all of the fielder_ variables having a missing value of 3159. The best explanation of this is that some ballparks (games in different countries) may not have measured these variables. 
+
+After looking at the colMeans, we see that a few variables are missing for every value in the dataset, so we drop them from the data frame. 
+```{r}
+load('pbp2019.rda')
+pbp2019[pbp2019=='null']<- NA
+head(pbp2019,5)
+colSums(is.na(pbp2019)) %>% sort(decreasing=TRUE)
+tidy_data <- pbp2019 %>% gather(key='row',value = 'value', -sv_id) %>% mutate(missing= ifelse(is.na(value),'yes','no'))
+colMeans(is.na(pbp2019))
+
+drop <- c('spin_dir', 'spin_rate_deprecated','break_angle_deprecated','break_length_deprecated','tfs_deprecated','tfs_zulu_deprecated','umpire')
+pbp2019 <- pbp2019[,!(names(pbp2019) %in% drop)]
+
+```
+
+```{r} 
+# read in season data frame
+season_data <- read.csv('FanGraphs_Leaderboard.csv')
+head(season_data,10)
+colnames(season_data)[1] <- 'Season'
+season_data[season_data=='null']<- NA
+colSums(is.na(season_data)) %>% sort(decreasing=TRUE)
+```
+
+An often noted trend in the MLB has been the increase in home runs, so we will look at a histogram faceted by season to see if teams tended to hit more home runs in recent years than previously. Clearly, this trend is noted for a reason as the histogram dramatically shifts over the years.  
+```{r}
+ggplot(season_data)+
+  geom_histogram(aes(x = HR))+
+  facet_wrap(~Season)
+```
