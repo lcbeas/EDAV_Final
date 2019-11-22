@@ -27,9 +27,9 @@ After looking at the colMeans, we see that a few variables are missing for every
 ```{r}
 load('pbp2019.rda')
 pbp2019[pbp2019=='null']<- NA
-head(pbp2019,5)
+head(pbp2019,100)
 colSums(is.na(pbp2019)) %>% sort(decreasing=TRUE)
-tidy_data <- pbp2019 %>% gather(key='row',value = 'value', -sv_id) %>% mutate(missing= ifelse(is.na(value),'yes','no'))
+#tidy_data <- pbp2019 %>% gather(key='row',value = 'value', -sv_id) %>% mutate(missing= ifelse(is.na(value),'yes','no'))
 colMeans(is.na(pbp2019))
 
 drop <- c('spin_dir', 'spin_rate_deprecated','break_angle_deprecated','break_length_deprecated','tfs_deprecated','tfs_zulu_deprecated','umpire')
@@ -57,6 +57,76 @@ ggplot(season_data)+
 
 ```{r}
 ggplot(season_data)+
-  geom_histogram(aes(x = AVG))+
+  geom_histogram(aes(x = WAR))+
   facet_wrap(~Team)
+```
+
+```{r}
+pbp2019 <- transform(pbp2019, plate_x = as.numeric(plate_x), plate_z = as.numeric(plate_z), release_speed = as.numeric(release_speed))
+
+empty_pt <- c('','EP','FO','KN',NA)
+
+temp_pt <- pbp2019[! pbp2019$pitch_type %in% empty_pt,]
+ggplot(temp_pt)+
+  geom_histogram(aes(x= release_speed))+
+  facet_wrap(~pitch_type)
+
+```
+
+```{r}
+
+ggplot(season_data, aes(Season, HR, color = Team)) + geom_line() +
+    ggtitle("Home runs over time") +
+    labs (x = "Season", y = "Total home runs") +
+    scale_x_continuous( breaks= c(2010,2015,2019))+
+    theme_grey(16) +
+    theme(legend.title = element_blank())
+
+```
+
+
+```{r}
+nl_east <- c('Marlins','Mets','Nationals','Phillies','Braves')
+temp_nl <- season_data[season_data$Team %in% nl_east,]
+head(temp_nl,10)
+
+ggplot(temp_nl, aes(Season, WAR, color = Team)) + geom_line() +
+    ggtitle("WAR over time") +
+    labs (x = "Season", y = "Total WAR") +
+    scale_x_continuous( breaks= c(2010,2015,2019))+
+    theme_grey(16) +
+    theme(legend.title = element_blank())
+
+```
+
+
+```{r}
+yelich_bellinger <- pbp2019 %>%
+  filter(batter == 545361 | batter == 621446)
+head(yelich_bellinger,100)
+
+ggplot(yelich_bellinger)+
+  geom_bin2d(aes(plate_x, plate_z, fill = type))+
+  facet_grid(~batter)
+
+```
+
+```{r}
+library(viridis)
+nl_east <- c('Marlins','Mets','Nationals','Phillies','Braves')
+agg_season_data <- read.csv('agg_leaderboard.csv')
+temp_agg_nl <- agg_season_data[agg_season_data$Team %in% nl_east,]
+head(temp_agg_nl,7)
+row.names(temp_agg_nl) <- temp_agg_nl$Team
+temp_agg_nl$Team <- NULL
+
+season_scaled <- data.frame(scale(temp_agg_nl)) %>%
+  rownames_to_column() %>%
+  gather(colname, value, -rowname)
+
+head(season_scaled)
+ggplot(season_scaled, aes(x = rowname, y = colname, fill = value)) +
+  geom_tile() + scale_fill_viridis() +
+  ggtitle("Team Stats scaled")
+
 ```
