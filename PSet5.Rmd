@@ -9,12 +9,8 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
 1. The Team
-  a) Luke Beasley (lcb2165), Chris Russo (cfr2125), 
+  a) Luke Beasley (lcb2165), Chris Russo (cfr2125), Gideon Teitel (gt2288)
 
   b) 
 Chris:
@@ -42,19 +38,15 @@ Violin plots/ridgeline etc.
 3. 
   Output: html_document (*plan right now is to create a shiny app as well)
   
-
 4. 
 
   The pitch by pitch Statcast data was gathered from baseballsavant.com via the Search page. We downloaded the data in .csv format. Due to the number of observations, we downloaded the pitches one week at a time. We then combined the data sets into an .rda file that contains all 743,495 pitches from the 2019 season.
 
   The team data was obtained from www.fangraphs.com, a website meant for hobbyists to explore data within baseball. After navigating to teams screen, we chose multiple seasons of data (2010-2019) and checked the "split seasons" button in order to have a different row for every season for each team, as opposed to aggregating each teams data over those years. The export data button downloads this file as a ready to use .csv file that we import after putting into the correct directory. 
   
-  
-  
 5.
 
-
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(extracat)
 library(tidyverse)
 ```
@@ -242,14 +234,10 @@ ggplot(df, aes(x = swing_rate,
 Surprisingly, in every case the swing rate is lower for pinch hitters. This contradicts the initial theory. Also, the swing rates among categories have the same sorted order, with more swings occuring with runners in scoring position and less swings on the first pitch.
 
 ```{r}
-library(ggplot2)
 balls <- pbp2019$balls
 
 strikes <- pbp2019$strikes
 
-
-
-pbp2019[balls == 2,]
 
 twotwocount <- pbp2019[strikes && balls == 2,]
 
@@ -263,11 +251,4 @@ ggplot(twotwocountplay1, aes(twotwocountplay))+
 ```
 
 We were surprised that a 3rd ball was by far the most popular outcome during a 2 2 pitch. A foul ball was also very popular as the batter is trying to "protect the plate", which means that the batter is not as passive compared to an 0 0 count when they would be free to take a pitch as a called strike if it is not their preferred location. It is very interesting that a a called third strike was more popular an outcome than a swinging strike. This could mean that batters on avg are not protecting the plate as much as they are trying to earn a walk or to get a favorable 3 2 count where in many situations they will get a better pitch to hit through the heart of the zone when the pitcher doesn't want to risk walking them. 
-
-
-
-
-
-
-
 
