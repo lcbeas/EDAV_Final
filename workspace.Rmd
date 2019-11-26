@@ -1,5 +1,6 @@
 ---
 title: "workspace"
+runtime: shiny
 output: html_document
 ---
 
@@ -17,6 +18,8 @@ When you click the **Knit** button a document will be generated that includes bo
   library(ggplot2)
   library(extracat)
   library(tidyverse)
+  library(shiny)
+  library(GeomMLBStadiums)
 ```
 
 After loading in the pbp2019 data set that will be used throughout this analysis, we will first examine the missing values. The data set has too many features to make use of a graph, but a few clear trends exist after looking at the column missing values and taking a look at the data. Many variables such as pitcher, batter, strikes, and balls, have no missing values, while others have large amounts. The explanation for this is inuitive: each pitch represents a row of data and the values without missing values are the values that exist no matter the outcome of the pitch. While many of the variables missing many values depend on the outcome of the pitch. A couple examples: launch_angle will not be present if the ball was not hit. on_2b will not be present if no one is on second base.
@@ -27,7 +30,7 @@ After looking at the colMeans, we see that a few variables are missing for every
 ```{r}
 load('pbp2019.rda')
 pbp2019[pbp2019=='null']<- NA
-head(pbp2019,100)
+
 colSums(is.na(pbp2019)) %>% sort(decreasing=TRUE)
 #tidy_data <- pbp2019 %>% gather(key='row',value = 'value', -sv_id) %>% mutate(missing= ifelse(is.na(value),'yes','no'))
 colMeans(is.na(pbp2019))
@@ -42,7 +45,7 @@ The season data frame has no missing values.
 ```{r} 
 # read in season data frame
 season_data <- read.csv('FanGraphs_Leaderboard.csv')
-head(season_data,10)
+
 colnames(season_data)[1] <- 'Season'
 season_data[season_data=='null']<- NA
 colSums(is.na(season_data)) %>% sort(decreasing=TRUE)
@@ -62,7 +65,7 @@ ggplot(season_data)+
 ```
 
 ```{r}
-pbp2019 <- transform(pbp2019, plate_x = as.numeric(plate_x), plate_z = as.numeric(plate_z), release_speed = as.numeric(release_speed))
+pbp2019 <- transform(pbp2019, plate_x = as.numeric(plate_x), plate_z = as.numeric(plate_z), release_speed = as.numeric(release_speed), hc_x = as.numeric(hc_x),hc_y = as.numeric(hc_y), launch_speed = as.numeric(launch_speed))
 
 empty_pt <- c('','EP','FO','KN',NA)
 
@@ -88,7 +91,7 @@ ggplot(season_data, aes(Season, HR, color = Team)) + geom_line() +
 ```{r}
 nl_east <- c('Marlins','Mets','Nationals','Phillies','Braves')
 temp_nl <- season_data[season_data$Team %in% nl_east,]
-head(temp_nl,10)
+
 
 ggplot(temp_nl, aes(Season, WAR, color = Team)) + geom_line() +
     ggtitle("WAR over time") +
@@ -103,7 +106,7 @@ ggplot(temp_nl, aes(Season, WAR, color = Team)) + geom_line() +
 ```{r}
 yelich_bellinger <- pbp2019 %>%
   filter(batter == 545361 | batter == 621446)
-head(yelich_bellinger,100)
+
 
 ggplot(yelich_bellinger)+
   geom_bin2d(aes(plate_x, plate_z, fill = type))+
@@ -116,7 +119,7 @@ library(viridis)
 nl_east <- c('Marlins','Mets','Nationals','Phillies','Braves')
 agg_season_data <- read.csv('agg_leaderboard.csv')
 temp_agg_nl <- agg_season_data[agg_season_data$Team %in% nl_east,]
-head(temp_agg_nl,7)
+
 row.names(temp_agg_nl) <- temp_agg_nl$Team
 temp_agg_nl$Team <- NULL
 
@@ -124,9 +127,36 @@ season_scaled <- data.frame(scale(temp_agg_nl)) %>%
   rownames_to_column() %>%
   gather(colname, value, -rowname)
 
-head(season_scaled)
+
 ggplot(season_scaled, aes(x = rowname, y = colname, fill = value)) +
   geom_tile() + scale_fill_viridis() +
   ggtitle("Team Stats scaled")
 
+```
+
+```{r echo = FALSE}
+selectInput("p_type", label = "Pitch Type: FF= Four-seam FB, SL=Slider, SI= Sinker, etc.",
+              choices = c(c("FF"),c("FS"),  c("SL"),c("SI"),c("CH"),c("FC"),c("CU"),c("FT"),c("KC")), multiple=TRUE, selected = c("FF"))
+
+sliderInput("x_axis", label = "Horizontal pitch location (0 is middle of the plate):",
+              min = -2 , max = 2, value = c(-2,2), step = 0.05)
+sliderInput("y_axis", label = "Vertical:",
+              min = 0 , max = 5, value = c(0,5), step = 0.05)
+
+textInput("batter", label = "Batter ID # (found on MLB.com)- Mike Trout = 545361", value = "545361")
+```
+
+```{r echo = FALSE}
+
+renderPlot({
+  pbp2019 %>%
+  filter(pitch_type %in% input$p_type,batter == as.numeric(as.character(input$batter)), plate_x > input$x_axis[1], plate_x < input$x_axis[2], plate_z > input$y_axis[1], plate_z <input$y_axis[2]) %>% mlbam_xy_transformation() %>%  
+  ggplot(aes(x=hc_x_, y=hc_y_, color = bb_type )) + 
+  geom_spraychart(stadium_ids = "brewers",
+                  stadium_transform_coords = TRUE, 
+                  stadium_segments = "all") + 
+  theme_void() + 
+  coord_fixed()
+
+})
 ```
