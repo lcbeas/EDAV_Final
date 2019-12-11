@@ -250,7 +250,7 @@ ggplot(df, aes(pinch_hitter, swing_rate)) +
 
 Interestingly, the swing rate for pinch hitters was lower in 2019. To go a bit further, consider some particular situations where a player might be more likely to swing. Namely, on the first pitch of a plate appearance (first), when the are in runners in scoring position (risp), and when it is the 7th inning or later in the game (late):
 
-```{r}
+```{r eval=FALSE}
 
 # first
 nl_games_ph_swings %>%
@@ -294,6 +294,9 @@ nl_games_ph_swings %>%
   summarize(pitches = n(),
             swing_rate = sum(swing) / pitches)
 
+```
+
+```{r}
 # create data frame with results
 df <- data.frame(situation = c("all","all","first","first",
                                "risp","risp","risp + first","risp + first",
@@ -302,9 +305,7 @@ df <- data.frame(situation = c("all","all","first","first",
                  ph = factor(c(0,1,0,1,0,1,0,1,0,1,0,1,0,1)),
                  swing_rate = c(.363,.340,.230,.201,.380,.351,.266,.212,
                                 .362,.337,.377,.344,.263,.206))
-```
 
-```{r}
 # cleveland dot plot
 theme_dotplot <- theme_bw(15) +
   theme(axis.text.y = element_text(size = rel(.75)),
