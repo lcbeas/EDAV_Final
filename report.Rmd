@@ -45,23 +45,24 @@ The goal of this project was to explore various questions related to Major Leagu
 # IV. Missing values
 
 
-After loading in the pbp2019 data set that will be used throughout this analysis, we will first examine the missing values. The data set has too many features to make use of a graph, but a few clear trends exist after looking at the column missing values and taking a look at the data. Many variables such as pitcher, batter, strikes, and balls, have no missing values, while others have large amounts. The explanation for this is inuitive: each pitch represents a row of data and the values without missing values are the values that exist no matter the outcome of the pitch. While many of the variables missing many values depend on the outcome of the pitch. A couple examples: launch_angle will be missing if the ball was not hit. on_2b will be missing if no one is on second base.
+After loading in the pbp2019 data set that will be used throughout this analysis, we will first examine the missing values. The data set has too many features to make use of an easy visualization, but a few clear trends exist after looking at the column missing values and taking a look at the data. Many variables such as pitcher, batter, strikes, and balls, have no missing values, while others have large amounts. The explanation for this is intuitive: each pitch represents a row of data and the values without missing values are the values that exist no matter the outcome of the pitch. While many of the variables missing many values depend on the outcome of the pitch. A couple examples: launch_angle will be missing if the ball was not hit. on_2b will be missing if no one is on second base.
 
 Interestingly, we see related variables share the same total count of missing variables, such as all of the fielder_ variables having a missing value of 3159. The best explanation of this is that some ballparks (games in different countries) may not have measured these variables. 
 
 After looking at the colMeans, we see that a few variables are missing for every value in the dataset, so we drop them from the data frame. 
 
+* the returned values from this analysis are hidden to save space, but can be commented out in the code to check
+
 ```{r}
 load('pbp2019.rda')
 pbp2019[pbp2019=='null']<- NA
 
-colSums(is.na(pbp2019)) %>% sort(decreasing=TRUE)
+# colSums(is.na(pbp2019)) %>% sort(decreasing=TRUE)
 
-colMeans(is.na(pbp2019))
+# colMeans(is.na(pbp2019))
 
 drop <- c('spin_dir', 'spin_rate_deprecated','break_angle_deprecated','break_length_deprecated','tfs_deprecated','tfs_zulu_deprecated','umpire') # columns missing every value
 pbp2019 <- pbp2019[,!(names(pbp2019) %in% drop)] # drop useless columns
-
 ```
 
 
