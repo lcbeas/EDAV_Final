@@ -393,8 +393,16 @@ Link to the app: https://cfrusso.shinyapps.io/spray_chart_by_pitch/
 
 # VII. Conclusion
 
+This project faced some limitations, but also laid solid groundwork for future analysis. Additionally, many lessons were learned, both technical lessons and team lessons. 
 
+## Limitations
+One limitation the project faced was in analyzing the missing data. Particularly, the fact that the dataset was so large and was missing a large amount of data made the task of visualizing the missing data challenging. However, the data showed clear trends and reasons for this missing data that we were able to garner from different analysis.
 
+## Future Analysis
+The Shiny application created in the project build a solid structure around a great idea and, for the future, we would love to continue building this application into a more user friendly and robust analysis tool for baseball fans and analysts alike. 
+
+## Lessons Learned
+One lesson learned through this project and throughout the semester, was that the first step in analysis should be questions. Datasets this large contain an enormous amount of potential analysis, so the first step should always be to decide what questions to attempt to answer before diving into analysis. The questions we chose are by no means exhaustive of the insights these data sets can provide, but they allowed us to narrow our focus. 
 
 
 
