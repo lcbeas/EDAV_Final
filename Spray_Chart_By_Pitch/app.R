@@ -20,7 +20,7 @@ ui <- fluidPage(
    sidebarLayout(
       sidebarPanel(
         selectInput("p_type",
-                    label = "Pitch Type: FF= Four-seam FB, SL=Slider, SI= Sinker, etc.",
+                    label = "Pitch Type: (Can choose multiple) FF= Four-seam FB, SL=Slider, SI= Sinker, etc.",
                     choices = c(c("FF"),c("FS"),c("SL"),c("SI"),c("CH"),
                                 c("FC"),c("CU"),c("FT"),c("KC")),
                     multiple=TRUE,
@@ -30,7 +30,7 @@ ui <- fluidPage(
                     label = "Horizontal pitch location (0 is middle of the plate, strike zone ~ [-1, 1]):",
                     min = -2 , max = 2, value = c(-2,2), step = 0.05),
 
-        sliderInput("y_axis", label = "Vertical pitch location (strike zone ~ [2,4] :",
+        sliderInput("y_axis", label = "Vertical pitch location (2.5 is roughly the middle of the zone, strike zone ~ [1.5,3.5] :",
                     min = 0 , max = 5, value = c(0,5), step = 0.05),
 
         textInput("batter",

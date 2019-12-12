@@ -31,15 +31,25 @@ The goal of this project was to explore various questions related to Major Leagu
 
 * [Home runs](#hr) - How have home run rates behaved in recent history?
 * [Team stats](#team) - How have teams performed in certain metrics in recent history?
-* [Pinch hitter](#ph) swing rates - Do pinch hitters swing more often?
+* [Pinch hitter swing rates](#ph) - Do pinch hitters swing more often?
 * [Pitches](#pitches) - 
 * [Plate discipline](#pd) - Can we use a heat map to identify how well a batter selects pitches to swing at?
-* [Spray chart by pitch location](#spray) - Where does a batter hit the ball based on the location of the pitch?
+* [Spray chart by pitch](#spray) - Where does a batter hit the ball based on the type and location of the pitch?
 
 # II. Data sources
 
+### Pitch by pitch Statcast data (2019)
+
+Statcast is an advanced tracking system that collects data on the movement of the baseball and the players for every pitch in a Major League Baseball (MLB) game. Variables include pitch velocity, movement, and spin rate, exit velocity and launch angle of a batted ball, and game situation information such as the players, inning, count, number of outs, etc. We used the 2019 data (including the playoffs), which consists of 743,495 pitches. The data was gathered from Baseball Savant, which  via the Search page (https://baseballsavant.mlb.com/statcast_search).
+
+### FanGraphs Team Statistics (2010-2019)
+
+FanGraphs is a website that develops and publishes statistics of MLB players and teams. We selected team statistics, seperated by season, for each of the last 10 seasons. The data was downloaded as a .csv file after applying the appropriate filters to the team stats batting leaderboard page (https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=0&type=8&season=2019&month=0&season1=2010&ind=1&team=0,ts&rost). The variables are mostly offenseive statistics, such as home runs and on-base percentage. Internally developed stats, such as Off (offense value), Def (defensive value), BsR (base running value), and WAR (also referred to as fWAR since other entities calculate WAR using their own methods) are also included. There are 300 total observations, with 10 seasons worth of stats for each of the 30 teams in MLB.
+
 
 # III. Data Transformation
+
+Due to the large number of observations, it was necessary to download the pitch by pitch data one week at a time. Once we had all of the .csv files, we combined them into one .rda file. The team statistics data set was read in directly from the .csv file. Since we are drawing from a large number of total variables, particularly in the pitch by pitch set which has 89, we decided to transform the variables as needed throughout the analysis instead of making all of the adjustments at the start. Most of the transformations consisted of adjusting class type, and some new variables were created as needed.
 
 
 # IV. Missing values
@@ -69,13 +79,13 @@ pbp2019 <- pbp2019[,!(names(pbp2019) %in% drop)] # drop useless columns
 The season data frame has no missing values, as it is an aggregated data set over the season.
 
 
-```{r} 
+```{r}
 # read in season data frame
 season_data <- read.csv('FanGraphs_Leaderboard.csv')
 
 colnames(season_data)[1] <- 'Season'
 season_data[season_data=='null']<- NA
-colSums(is.na(season_data)) %>% sort(decreasing=TRUE)
+# colSums(is.na(season_data)) %>% sort(decreasing=TRUE)
 ```
 
 
@@ -185,11 +195,12 @@ parcoords(agg_season_data,
 
 ```
 
+If we filter on WAR, the Red Sox, Yankees, and Dodgers have been easily the most successful teams over the decade. Breaking down by type of production, the Yankees and Red Sox were far and away the top offensive teams, the Giants and Diamondbacks were the best defensively, and the Rangers, Yankees, Padres, and Indians were the best base runners. Overall, those four metrics have inconsistent interactions, which makes sense because different teams accumulated WAR in different ways. However, if we move Off next to WAR, we see that Off is more positively associated with WAR than the others. In other words, offensive value is the most important factor in determining total production, which makes logical sense. The most direct relationship is that runs scored (R) and runs batted in (RBI) match up almost perfectly, which is a trivial observation since almost every run scored is driven in by a batter. 
 
 
 ## Pinch hitter swing rates {#ph}
 
-There is a general sense in baseball that pinch hitters are more likely to swing away. Since it is likely their only plate appearance in the game, the thought is that there is no reason to take a few pitches to get a look at the pitcher or ease their way into the game. To examine this theory, consider the swing rates for 2019 National League batters.
+There is a general sense in baseball that pinch hitters are more likely to swing away. Since it is likely their only plate appearance in the game, the thought is that there is no reason to take a few pitches to get a look at the pitcher or ease their way into the game. To examine this theory, we first needed to identify pinch hitters. Note the data does not give this information directly. So, we used the game information - namely the players currently on the field - to determine when a batter enters the game before being on the field. Since the data does not provide information on the designated hitter, this method will not work for games played in American League ballparks. This is not a major problem, as most pinch hitting happens in the National League, so we focus the analysis on National League pinch hitters.
 
 ```{r}
 # sort pitches sequentially within each game
@@ -249,7 +260,7 @@ ggplot(df, aes(pinch_hitter, swing_rate)) +
 
 ```
 
-Interestingly, the swing rate for pinch hitters was lower in 2019. To go a bit further, consider some particular situations where a player might be more likely to swing. Namely, on the first pitch of a plate appearance (first), when the are in runners in scoring position (risp), and when it is the 7th inning or later in the game (late):
+Interestingly, the swing rate for pinch hitters was lower in 2019. To go a bit further, consider the differences in some particular game situations. Namely, on the first pitch of a plate appearance (first), when there are in runners in scoring position (risp), and when it is the 7th inning or later in the game (late):
 
 ```{r eval=FALSE}
 
@@ -329,7 +340,7 @@ ggplot(df, aes(x = swing_rate,
 
 ```
 
-We have another surprising result, as in every case the swing rate is lower for pinch hitters. This contradicts the initial theory. Also, the swing rates among categories have the same sorted order, with more swings occuring with runners in scoring position and less swings on the first pitch.
+We have another surprising result, as in every case the swing rate is lower for pinch hitters. This contradicts the initial theory, but it is important to remember this is only based on 2019. It may be the case that pinch hitters were more aggressive in the past, but their behavior has changed over time. Another interesting piece of this graph is that swing rates among categories have the same sorted order, with more swings occuring with runners in scoring position and less swings on the first pitch.
 
 ## Pitches {#pitches}
 
@@ -373,7 +384,7 @@ ggplot(trout_brinson)+
 
 # VI. Interactive component
 
-## Spray chart by pitch location {#spray}
+## Spray chart by pitch {#spray}
 
 As outlined in Luke and Chris' community contribution project, the package GeomMLBStadiums can be used to create a spray chart for balls in play. We used a Shiny Application to make this tool as flexible as the user would like it to be. The app provides the opportunity to choose which batter to analyze, while restricting the pitch type to certain pitches and certain areas of the strike zone. The horizontal and vertical pitch location allow the user to restrict the pitches to certain areas. So questions of the following sort can be answered: "how does Christian Yelich hit pitches that are high and outside compared to pitches low and inside?" Enjoy the tool!
 

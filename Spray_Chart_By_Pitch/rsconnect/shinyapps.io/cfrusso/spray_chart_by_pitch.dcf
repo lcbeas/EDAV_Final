@@ -5,6 +5,6 @@ account: cfrusso
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 1587471
-bundleId: 2657534
+bundleId: 2660491
 url: https://cfrusso.shinyapps.io/spray_chart_by_pitch/
-when: 1576029013.56507
+when: 1576109573.79908
