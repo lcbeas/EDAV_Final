@@ -1,5 +1,5 @@
 ---
-title: "Exploratory Analysis and Visualization Baseball Data"
+title: "Exploratory Analysis and Visualization of Baseball Data"
 author: "Luke Beasley, Chris Russo, Gideon Teitel"
 output:
   html_document:
